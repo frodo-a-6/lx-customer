@@ -1,13 +1,6 @@
 import {Construct} from "constructs";
 import {Bucket} from "aws-cdk-lib/aws-s3";
-import {
-    CfnDistribution,
-    CfnOriginAccessControl,
-    Distribution,
-    OriginAccessIdentity,
-    ViewerProtocolPolicy
-} from "aws-cdk-lib/aws-cloudfront";
-import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
+import {CfnDistribution, CfnOriginAccessControl} from "aws-cdk-lib/aws-cloudfront";
 import {CfnOutput} from "aws-cdk-lib";
 import {PolicyStatement, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 
@@ -24,17 +17,32 @@ export class CloudfrontConstruct extends Construct {
                 description: 'OAC for frontend S3 access',
             },
         });
+        const distribution = new CfnDistribution(this, 'FrontendDistribution', {
+            distributionConfig: {
+                defaultRootObject: 'index.html',
+                enabled: true,
+                origins: [
+                    {
+                        id: 'S3Origin',
+                        domainName: bucket.bucketRegionalDomainName,
+                        originAccessControlId: oac.attrId,
+                        s3OriginConfig: {}, // ← leer bedeutet: keine OAI
+                    }
+                ],
+                defaultCacheBehavior: {
+                    targetOriginId: 'S3Origin',
+                    viewerProtocolPolicy: 'redirect-to-https',
+                    allowedMethods: ['GET', 'HEAD'],
+                    cachedMethods: ['GET', 'HEAD'],
+                    forwardedValues: {
+                        queryString: false,
+                        cookies: { forward: 'none' },
+                    },
+                }
+            }
+        });
 
-        const distribution = new Distribution(this, 'FrontendDistribution', {
-            defaultRootObject: 'index.html',
-            defaultBehavior: {
-                origin: new S3Origin(bucket),
-                viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            },
-        })
-
-        const cfnDistribution = distribution.node.defaultChild  as CfnDistribution;
-        cfnDistribution.addPropertyOverride('DistributionConfig.Origins.0.OriginAccessControlId', oac.attrId);
+        distribution.addPropertyOverride('DistributionConfig.Origins.0.OriginAccessControlId', oac.attrId);
 
         bucket.addToResourcePolicy(new PolicyStatement({
             actions: ['s3:GetObject'],
@@ -42,12 +50,12 @@ export class CloudfrontConstruct extends Construct {
             principals: [new ServicePrincipal('cloudfront.amazonaws.com')],
             conditions: {
                 StringEquals: {
-                    'AWS:SourceArn': `arn:aws:cloudfront::${account}:distribution/${distribution.distributionId}`,
+                    'AWS:SourceArn': `arn:aws:cloudfront::${account}:distribution/${distribution.attrId}`,
                 },
             },
         }));
 
-        const cloudFrontUrl = `https://${distribution.domainName}`;
+        const cloudFrontUrl = `https://${distribution.attrDomainName}`;
 
         new CfnOutput(this, 'CloudFrontURL', {
             value: cloudFrontUrl,

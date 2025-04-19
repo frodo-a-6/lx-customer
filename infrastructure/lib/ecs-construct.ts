@@ -111,6 +111,8 @@ export class EcsConstruct extends Construct {
 
         new CfnOutput(this, 'BackendURL', {
             value: 'http://' + fargate.loadBalancer.loadBalancerDnsName,
+            description: 'The URL of the backend service',
+            exportName: 'BackendURL',
         });
     }
 }
