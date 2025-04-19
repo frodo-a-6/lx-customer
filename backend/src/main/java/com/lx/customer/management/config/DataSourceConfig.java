@@ -38,7 +38,7 @@ public class DataSourceConfig {
             dataSource.setJdbcUrl(url);
             dataSource.setUsername(secret.getUsername());
             dataSource.setPassword(secret.getPassword());
-
+            System.out.println("→ JDBC URL: " + url);
             return dataSource;
         } catch (Exception e) {
             throw new RuntimeException("DataSource creation failed", e);
