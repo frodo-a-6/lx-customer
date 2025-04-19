@@ -11,6 +11,7 @@ import {Cluster, ContainerImage, FargateService} from "aws-cdk-lib/aws-ecs";
 import {ApplicationLoadBalancedFargateService} from "aws-cdk-lib/aws-ecs-patterns";
 import {Repository} from "aws-cdk-lib/aws-ecr";
 import {ManagedPolicy, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
+import {CfnOutput, Duration} from "aws-cdk-lib";
 
 export class EcsConstruct extends Construct {
     public readonly fargateService: FargateService
@@ -48,6 +49,12 @@ export class EcsConstruct extends Construct {
             taskSubnets: {
                 subnetType: SubnetType.PUBLIC,
             },
+            healthCheckGracePeriod: Duration.seconds(60),
+        });
+
+        fargate.targetGroup.configureHealthCheck({
+            path: '/actuator/health',
+            healthyHttpCodes: '200',
         });
 
         this.fargateService = fargate.service;
@@ -100,6 +107,10 @@ export class EcsConstruct extends Construct {
                 subnetType: SubnetType.PUBLIC,
             },
             securityGroups: [endpointSecGrp]
+        });
+
+        new CfnOutput(this, 'BackendURL', {
+            value: 'http://' + fargate.loadBalancer.loadBalancerDnsName,
         });
     }
 }

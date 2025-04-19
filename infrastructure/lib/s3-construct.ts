@@ -8,8 +8,6 @@ export class S3Construct extends Construct {
         super(scope, id);
 
         this.bucket = new Bucket(this, 'FrontendHostingBucket', {
-            websiteIndexDocument: 'index.html',
-            websiteErrorDocument: 'index.html',
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
