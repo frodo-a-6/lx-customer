@@ -118,4 +118,16 @@ class CustomerValidatorTest {
         assertTrue(violations.isEmpty(), violations.stream().map(ConstraintViolation::getMessage).toList().toString());
     }
 
+    @Test
+    void isInvalidGermanWithAdditionalVatIdChars() {
+        Customer customer = new Customer();
+        customer.setFirstName("John");
+        customer.setLastName("Doe");
+        customer.setVatId("DE123456789abc");
+
+        Set<ConstraintViolation<Customer>> violations = validator.validate(customer);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("VAT ID must match a valid format (e.g. DE123456789 or ATU12345678)")));
+    }
+
 }

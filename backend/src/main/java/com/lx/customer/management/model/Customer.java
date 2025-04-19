@@ -44,13 +44,13 @@ public class Customer {
                 message = "This country is not supported"
         ),
         @Pattern(
-                regexp = "^(DE\\d{9})|" +
-                        "(ATU\\d{8})|" +
-                        "(FR[A-Z0-9]{2}\\d{9})|" +
-                        "(GB\\d{9})|(GB\\d{12})|(GB(GD|HA)([A-Z0-9]{3})\\d{12})|" +
-                        "(DK\\d{8})|" +
-                        "(NL\\d{9}B\\d{2})$",
-                message = "German VAT ID must match a valid format (e.g. DE123456789 or ATU12345678)"
+                regexp = "^(?:DE\\d{9}|" +
+                        "ATU\\d{8}|" +
+                        "FR[A-Z0-9]{2}\\d{9}|" +
+                        "GB\\d{9}|GB\\d{12}|GB(GD|HA)[A-Z0-9]{3}\\d{12}|" +
+                        "DK\\d{8}|" +
+                        "NL\\d{9}B\\d{2})$",
+                message = "VAT ID must match a valid format (e.g. DE123456789 or ATU12345678)"
         )
     })
     private String vatId;

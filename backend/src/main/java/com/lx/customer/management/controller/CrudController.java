@@ -22,7 +22,7 @@ public abstract class CrudController<T, ID> {
 
     @GetMapping
     public List<T> findAll() {
-        return repository.findAll();
+        return repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     @GetMapping("/{page}/{size}/{orderBy}/{direction}")
@@ -46,7 +46,7 @@ public abstract class CrudController<T, ID> {
         return ResponseEntity.ok(savedEntity);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<T> update(@PathVariable ID id, @RequestBody T entity) {
         if (!repository.existsById(id)) {
             return ResponseEntity.notFound().build();
