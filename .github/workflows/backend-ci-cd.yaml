@@ -24,6 +24,7 @@ jobs:
 
       - name: Build and run tests
         run: ./gradlew build
+        working-directory: ./backend
 
       - name: Build Spring Boot App
         run: ./gradlew bootJar
