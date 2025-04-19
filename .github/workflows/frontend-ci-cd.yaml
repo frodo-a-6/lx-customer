@@ -35,6 +35,7 @@ jobs:
             --query "Exports[?Name=='BackendURL'].Value" \
             --output text)
           echo "REACT_APP_API_URL=$url" >> $GITHUB_ENV
+          echo "Backend URL: $url"
 
       - name: Build the application
         run: npm run build
