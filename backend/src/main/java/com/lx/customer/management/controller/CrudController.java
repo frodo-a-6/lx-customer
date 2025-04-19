@@ -1,6 +1,9 @@
 package com.lx.customer.management.controller;
 
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +24,14 @@ public abstract class CrudController<T, ID> {
     public List<T> findAll() {
         return repository.findAll();
     }
+
+    @GetMapping("/{page}/{size}/{orderBy}/{direction}")
+    public List<T> findAll(@PathVariable int page, @PathVariable int size, @PathVariable String orderBy, @PathVariable String direction) {
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return repository.findAll(pageable).getContent();
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<T> findById(@PathVariable ID id) {

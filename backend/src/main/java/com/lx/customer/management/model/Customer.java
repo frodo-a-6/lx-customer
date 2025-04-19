@@ -1,12 +1,13 @@
 package com.lx.customer.management.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,13 +26,12 @@ public class Customer {
     @NotNull(message = "Last name is required")
     private String lastName;
 
-    private String addressLine1;
-    private String addressLine2;
+    private String address;
     private String postalCode;
     private String city;
-    private String countryIsoCode;
 
-    @Max(value = 100, message = "Details cannot exceed 100 characters")
+    @Column(length = 100)
+    @Size(max = 100, message = "Details cannot exceed 100 characters")
     private String details;
 
     @Pattern.List({

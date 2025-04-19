@@ -2,18 +2,23 @@ plugins {
     id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
     java
+    kotlin("jvm") version "2.1.20"
 }
 
 group = "com.lx.customer"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenCentral()
 }
 
-configurations {
-    create("jaxwsTools")
+@Suppress("unused")
+val jaxwsTools: Configuration? by configurations.creating
+
+dependencyManagement {
+    imports {
+        mavenBom("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.0")
+    }
 }
 
 dependencies {
@@ -28,10 +33,14 @@ dependencies {
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
     implementation("org.glassfish.jaxb:jaxb-runtime:3.0.2")
     add("jaxwsTools", "com.sun.xml.ws:jaxws-tools:3.0.2")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-secrets-manager:3.1.0")
+    implementation("com.amazonaws.secretsmanager:aws-secretsmanager-jdbc:2.0.2")
+    implementation("com.google.code.gson:gson")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
@@ -59,4 +68,7 @@ val generateSoapClient by tasks.registering(JavaExec::class) {
 sourceSets["main"].java.srcDir(layout.buildDirectory.dir("generated-sources/wsdl").get().asFile)
 tasks.named("compileJava") {
     dependsOn(generateSoapClient)
+}
+kotlin {
+    jvmToolchain(21)
 }
