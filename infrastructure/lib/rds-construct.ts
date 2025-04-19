@@ -4,22 +4,24 @@ import {InstanceClass, InstanceSize, InstanceType, Peer, Port, SubnetType, Vpc} 
 import {Secret} from 'aws-cdk-lib/aws-secretsmanager';
 import {RemovalPolicy} from "aws-cdk-lib";
 import {FargateService} from "aws-cdk-lib/aws-ecs";
+import {Effect, PolicyStatement} from "aws-cdk-lib/aws-iam";
 
 export class RdsConstruct extends Construct {
+    public readonly secret: Secret;
+
     constructor(scope: Construct, id: string, vpc: Vpc, fargateService: FargateService) {
         super(scope, id);
 
-        const rdsSecret = new Secret(this, 'rds-master-secret', {
+        this.secret = new Secret(this, 'rds-master-secret', {
             secretName: 'rds-master-secret',
             description: "Database master user credentials",
             generateSecretString: {
-                secretStringTemplate: JSON.stringify({ username: 'postgres', port: '5432' }),
+                secretStringTemplate: JSON.stringify({username: 'postgres', port: '5432'}),
                 generateStringKey: 'password',
                 passwordLength: 16,
                 excludePunctuation: true,
             },
         });
-
         const instance = new DatabaseInstance(this, 'PostgresInstance', {
             engine: DatabaseInstanceEngine.postgres({
                 version: PostgresEngineVersion.of('17.2', 'postgres17'),
@@ -29,7 +31,7 @@ export class RdsConstruct extends Construct {
             publiclyAccessible: true,
             instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
             allocatedStorage: 20,
-            credentials: Credentials.fromSecret(rdsSecret),
+            credentials: Credentials.fromSecret(this.secret),
             multiAz: false,
             deletionProtection: false,
             removalPolicy: RemovalPolicy.DESTROY,
@@ -41,6 +43,14 @@ export class RdsConstruct extends Construct {
         )
 
         instance.connections.allowDefaultPortFrom(fargateService, 'Allow ECS to connect to RDS');
+
+        fargateService.taskDefinition.taskRole.addToPrincipalPolicy(
+            new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ['secretsmanager:GetSecretValue'],
+                resources: [this.secret.secretArn]
+            })
+        )
     }
 }
 
