@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import {SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
 
 export class VpcConstruct extends Construct {
     public readonly vpc: Vpc;
@@ -9,7 +9,14 @@ export class VpcConstruct extends Construct {
 
         this.vpc = new Vpc(this, 'Vpc', {
             maxAzs: 2,
-            natGateways: 1,
+            natGateways: 0,
+            subnetConfiguration: [
+                {
+                    cidrMask: 24,
+                    name: 'public-subnet',
+                    subnetType: SubnetType.PUBLIC,
+                },
+            ],
         });
     }
 }
