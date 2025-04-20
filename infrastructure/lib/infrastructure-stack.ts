@@ -14,7 +14,7 @@ export class InfrastructureStack extends cdk.Stack {
         const cluster = new EcsConstruct(this, 'ECS', vpc.vpc);
         new RdsConstruct(this, 'RDS', vpc.vpc, cluster.fargateService);
         const bucket = new S3Construct(this, 'FrontendS3');
-        new CloudfrontConstruct(this, 'CloudFront', bucket.bucket, this.account);
+        new CloudfrontConstruct(this, 'CloudFront', bucket.bucket, this.account, cluster.alsDnsName);
 
     }
 }

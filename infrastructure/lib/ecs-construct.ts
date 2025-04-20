@@ -11,10 +11,11 @@ import {Cluster, ContainerImage, FargateService} from "aws-cdk-lib/aws-ecs";
 import {ApplicationLoadBalancedFargateService} from "aws-cdk-lib/aws-ecs-patterns";
 import {Repository} from "aws-cdk-lib/aws-ecr";
 import {ManagedPolicy, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
-import {CfnOutput, Duration} from "aws-cdk-lib";
+import {Duration} from "aws-cdk-lib";
 
 export class EcsConstruct extends Construct {
     public readonly fargateService: FargateService
+    public readonly alsDnsName: string;
 
     constructor(scope: Construct, id: string, vpc: Vpc) {
         super(scope, id);
@@ -109,10 +110,6 @@ export class EcsConstruct extends Construct {
             securityGroups: [endpointSecGrp]
         });
 
-        new CfnOutput(this, 'BackendURL', {
-            value: 'http://' + fargate.loadBalancer.loadBalancerDnsName,
-            description: 'The URL of the backend service',
-            exportName: 'BackendURL',
-        });
+        this.alsDnsName = fargate.loadBalancer.loadBalancerDnsName;
     }
 }

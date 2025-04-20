@@ -32,7 +32,7 @@ jobs:
         id: backend-url
         run: |
           url=$(aws cloudformation list-exports \
-            --query "Exports[?Name=='BackendURL'].Value" \
+            --query "Exports[?Name=='BackendCloudFrontUrl'].Value" \
             --output text)
           echo "VITE_API_URL=$url" >> $GITHUB_ENV
 
