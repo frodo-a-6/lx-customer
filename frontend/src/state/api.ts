@@ -8,6 +8,7 @@ const doFetch = (requestUrl: string, requestParams: {
     headers: { "Content-Type": string };
     body: string
 } | undefined, onError: (error: (string | null)) => void, onDispatch: (value: Customer[]) => void, onLoading: (loading: boolean) => void) => {
+    console.log("API URL:", process.env.REACT_APP_API_URL);
     fetch(requestUrl, requestParams)
         .catch(reason => {
             onError(reason);
