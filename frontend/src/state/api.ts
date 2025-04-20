@@ -1,6 +1,6 @@
 import {Customer} from "../types";
 
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const API_URL = API_BASE + "/api/customers";
 
 const doFetch = (requestUrl: string, requestParams: {
@@ -8,7 +8,6 @@ const doFetch = (requestUrl: string, requestParams: {
     headers: { "Content-Type": string };
     body: string
 } | undefined, onError: (error: (string | null)) => void, onDispatch: (value: Customer[]) => void, onLoading: (loading: boolean) => void) => {
-    console.log("API URL:", process.env.REACT_APP_API_URL);
     fetch(requestUrl, requestParams)
         .catch(reason => {
             onError(reason);

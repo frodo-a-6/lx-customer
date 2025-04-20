@@ -34,10 +34,7 @@ jobs:
           url=$(aws cloudformation list-exports \
             --query "Exports[?Name=='BackendURL'].Value" \
             --output text)
-          echo "REACT_APP_API_URL=$url" >> $GITHUB_ENV
-
-      - name: Write API URL to .env
-        run: echo "REACT_APP_API_URL=${{ env.REACT_APP_API_URL }}" > ./frontend/.env
+          echo "VITE_API_URL=$url" >> $GITHUB_ENV
 
       - name: Build the application
         run: npm run build
