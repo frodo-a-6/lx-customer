@@ -36,6 +36,9 @@ jobs:
             --output text)
           echo "REACT_APP_API_URL=$url" >> $GITHUB_ENV
 
+      - name: Write API URL to .env
+        run: echo "REACT_APP_API_URL=${{ env.REACT_APP_API_URL }}" > ./frontend/.env
+
       - name: Build the application
         run: npm run build
         working-directory: ./frontend
